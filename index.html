@@ -338,19 +338,29 @@
         let printWindow = window.open('', '_blank');
 
         // Write the beginning of the HTML
-        printWindow.document.write(`<html><head><title>HACK-DX-${isoSpeedText}/${filmLengthText}</title></head><body>`);
+        printWindow.document.write(`<html>
+<head><title>HACK-DX-${isoSpeedText}/${filmLengthText}${n}x</title>
+<style>
+    @media print {
+    * {
+        -webkit-print-color-adjust: exact !important; /*Chrome, Safari */
+        color-adjust: exact !important;  /*Firefox*/
+      }
+    }
+    body {
+        font-family: sans-serif;
+        font-size: 12px;
+        margin: 0;
+        padding: 0;
+    }
+</style>
+</head>
+<body>`);
 
-        printWindow.document.write(`
-            <div>
-                <b>ISO/DIN:</b> ${isoSpeedText} <br>
-                <b>Film length:</b> ${filmLengthText} <br>
-                <b>Exposure tolerance:</b> ${exposureToleranceText} <br>
-            </div>
-        `);
 
         // Create the DX code grids
         for (let i = 0; i < n; i++) {
-            let container = '<div style="display: flex; flex-wrap: wrap; width: 33mm; box-sizing: border-box; border-bottom: 1px solid gray; border-left: 1px solid gray; margin: 1mm">';
+            let container = '<div style="display: flex; flex-wrap: wrap; width: 33mm; box-sizing: border-box; border-bottom: 1px solid gray; border-left: 1px solid gray; margin: 0 0 0.5mm 0">';
             for (let j = 0; j < code.length; j++) {
                 let cell = `<div style="width: 5.4mm; height: 7.5mm; background-color: ${code[j] === '1' ? 'white' : 'black'}; border-top: 1px solid gray; border-right: 1px solid gray; box-sizing: border-box;"></div>`;
                 container += cell;
@@ -360,6 +370,15 @@
             // Add the container to the HTML
             printWindow.document.write(container);
         }
+
+        printWindow.document.write(`
+            <div>
+                <b>ISO/DIN:</b> ${isoSpeedText} <br>
+                <b>Film length:</b> ${filmLengthText} <br>
+                <b>Exposure tolerance:</b> ${exposureToleranceText} <br>
+            </div>
+        `);
+
 
         // Write the end of the HTML
         printWindow.document.write('</body></html>');
