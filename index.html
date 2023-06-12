@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <meta name="author" content="Dmytro Matsiuk">
-    <meta name="description" content="DX Encoding Simulator online Film DX decoder; Reading DX Camera Auto Sensing codes">
+    <meta name="description"
+          content="DX Encoding Simulator online Film DX decoder; Reading DX Camera Auto Sensing codes">
     <meta name="keywords"
           content="DX Encoding Simulator, DX Encoding, DX decoder, DX encoder, DX film, DX film decoder, DX film encoder, DX film simulator, DX film simulator online, DX film">
     <meta name="robots" content="index, follow">
@@ -25,7 +26,8 @@
             display: flex;
             flex-wrap: wrap;
         }
-        .container .item{
+
+        .container .item {
             margin: 0 25px;
         }
 
@@ -170,7 +172,12 @@
 
 
 </div>
-
+<h3>hack your DX</h3>
+<label>
+    count of DX prints:
+    <input type="number" value="1" id="n" style="width: 30px" placeholder="count">
+</label>
+<button onclick="printDXCode()">print</button>
 <div class="footer">
     <hr>
     <ul>
@@ -279,6 +286,8 @@
         return null
     }
 
+    let isoSpeedText, filmLengthText, exposureToleranceText;
+
     function decode() {
         // Read the state of the checkboxes
         code = "";
@@ -292,9 +301,9 @@
         let filmLength = code.slice(6, 10);
         let exposureTolerance = code.slice(10, 12);
         // Calculate the decimal values
-        let isoSpeedText = getText(isoSpeeds, isoSpeed) || "custom";
-        let filmLengthText = getText(filmLengths, filmLength) || "other";
-        let exposureToleranceText = getText(exposureTolerances, exposureTolerance) || "other";
+        isoSpeedText = getText(isoSpeeds, isoSpeed) || "custom";
+        filmLengthText = getText(filmLengths, filmLength) || "other";
+        exposureToleranceText = getText(exposureTolerances, exposureTolerance) || "other";
         // Display the result
 
         document.getElementById('filmLength').value = filmLength;
@@ -314,11 +323,49 @@
             let checkbox = document.getElementById('c' + i);
             checkbox.checked = code[i - 1] === '0';
         }
+        console.log(code)
     }
 
     isoSpeedSelect.onchange = encode;
     filmLengthSelect.onchange = encode;
     exposureToleranceSelect.onchange = encode;
+
+    const printDXCode = () => {
+        // Create a new window
+        let n = document.getElementById('n').value;
+        let printWindow = window.open('', '_blank');
+
+        // Write the beginning of the HTML
+        printWindow.document.write('<html><head><title>Print</title></head><body>');
+
+        printWindow.document.write(`
+            <div>
+                <b>ISO/DIN:</b> ${isoSpeedText} <br>
+                <b>Film length:</b> ${filmLengthText} <br>
+                <b>Exposure tolerance:</b> ${exposureToleranceText} <br>
+            </div>
+        `);
+
+        // Create the DX code grids
+        for (let i = 0; i < n; i++) {
+            let container = '<div style="display: flex; flex-wrap: wrap; width: 33mm; box-sizing: border-box; border-bottom: 1px solid gray; border-left: 1px solid gray; margin: 1mm">';
+            for (let j = 0; j < code.length; j++) {
+                let cell = `<div style="width: 5.4mm; height: 7.5mm; background-color: ${code[j] === '1' ? 'white' : 'black'}; border-top: 1px solid gray; border-right: 1px solid gray; box-sizing: border-box;"></div>`;
+                container += cell;
+            }
+            container += '</div>';
+
+            // Add the container to the HTML
+            printWindow.document.write(container);
+        }
+
+        // Write the end of the HTML
+        printWindow.document.write('</body></html>');
+
+        // Tell the browser to print the new window
+        printWindow.print();
+    }
+
 
     decode()
 </script>
