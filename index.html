@@ -314,8 +314,10 @@
     <span title="ISO/DIN"> ISO/DIN  ${isoSpeedText} </span>  ·
     <span title="exposure tolerance">  ${exposureToleranceText} </span>
     `
-        // document.getElementById('result').innerHTML = result;
+        console.log("DX", code)
+
     }
+
 
     function encode() {
         code = isoSpeedSelect.value + filmLengthSelect.value + exposureToleranceSelect.value;
@@ -323,7 +325,7 @@
             let checkbox = document.getElementById('c' + i);
             checkbox.checked = code[i - 1] === '0';
         }
-        console.log(code)
+        decode();
     }
 
     isoSpeedSelect.onchange = encode;
