@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DX Encoding Simulator</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="author" content="Dmytro Matsiuk">
+    <meta name="description" content="DX Encoding Simulator online Film DX decoder">
+    <meta name="keywords"
+          content="DX Encoding Simulator, DX Encoding, DX decoder, DX encoder, DX film, DX film decoder, DX film encoder, DX film simulator, DX film simulator online, DX film">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="theme-color" content="#000000">
+    <meta property="og:title" content="DX Encoding Simulator">
+    <meta property="og:description" content="DX Encoding Simulator online Film DX decoder">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <!--    manifest-->
+    <link rel="manifest" href="site.webmanifest">
+    <style>
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1px;
+            background: gray;
+            padding: 1px;
+            width: 200px;
+        }
+
+        .checkbox {
+            display: none;
+        }
+
+        .checkbox + label {
+            display: block;
+            cursor: cell;
+            height: 30px;
+            background: white;
+        }
+
+        .checkbox:checked + label {
+            background: black;
+            cursor: pointer;
+        }
+
+        .checkbox:disabled + label {
+            color: gray;
+            cursor: not-allowed;
+        }
+
+        #film {
+            border: 1px solid black;
+            padding: 5px 10px 30px 10px;
+            margin: 0;
+            display: inline-block;
+            height: 64px;
+            background: rgb(255, 181, 95);
+            text-decoration: none;
+            text-align: center;
+        }
+
+        #roll {
+            display: inline-block;
+            margin: -25px -5px;
+            background: #333333;
+            border: 1px solid black;
+            height: 40px;
+            width: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>DX Encoding Simulator</h1>
+<div id="roll"></div>
+<div id="film">
+    <span id="title">  </span>
+    <div id="grid"></div>
+</div>
+<p id="result"></p>
+
+<div>
+    <a href="https://github.com/dmmat/DX-decoder"> Contribute on Github</a>
+</div>
+<script>
+    // Create checkboxes
+    let grid = document.getElementById('grid');
+    for (let i = 1; i <= 12; i++) {
+        let checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'checkbox';
+        checkbox.id = 'c' + i;
+        checkbox.onclick = decode;
+
+        let label = document.createElement('label');
+        label.htmlFor = checkbox.id;
+
+        if (i === 1 || i === 7) {
+            checkbox.disabled = true;
+            label.innerHTML = "G"
+        }
+
+
+        grid.appendChild(checkbox);
+        grid.appendChild(label);
+    }
+
+    function encodeISOSpeed(input) {
+        return ({
+            "100010": "25/15°",
+            "100001": "32/16°",
+            "100011": "40/17°",
+            "110010": "50/18°",
+            "110001": "64/19°",
+            "110011": "80/20°",
+            "101010": "100/21°",
+            "101001": "125/22°",
+            "101011": "160/23°",
+            "111010": "200/24°",
+            "111001": "250/25°",
+            "111011": "320/26°",
+            "100110": "400/27°",
+            "100101": "500/28°",
+            "100111": "640/29°",
+            "110110": "800/30°",
+            "110101": "1000/31°",
+            "110111": "1250/32°",
+            "101110": "1600/33°",
+            "101101": "2000/34°",
+            "101111": "2500/35°",
+            "111110": "3200/36°",
+            "111101": "4000/37°",
+            "111111": "5000/38°"
+        })[input] || "custom";
+    }
+
+    function encodeFilmLength(input) {
+        return ({
+            "1100": "12 exp",
+            "1010": "20 exp",
+            "1110": "24 exp",
+            "1001": "36 exp",
+            "1101": "48 exp",
+            "1011": "60 exp",
+            "1111": "72 exp",
+        })[input] || "other";
+    }
+
+    function encodeExposureTolerance(input) {
+        return ({
+            "00": "± 1/2",
+            "10": "± 1",
+            "01": "+2 -1",
+            "11": "+3 -1",
+        })[input] || "other";
+    }
+
+    function decode() {
+        // Read the state of the checkboxes
+        let code = "";
+        for (let i = 1; i <= 12; i++) {
+            let checkbox = document.getElementById('c' + i);
+            // If the checkbox is checked, add a '1' to the code, else add a '0'
+            code += checkbox.checked ? '0' : '1';
+        }
+        // Split the code into parts
+        let isoSpeed = code.slice(0, 6);
+        let filmLength = code.slice(6, 10);
+        let exposureTolerance = code.slice(10, 12);
+        console.log(isoSpeed, filmLength, exposureTolerance)
+        // Calculate the decimal values
+        let isoSpeedDec = encodeISOSpeed(isoSpeed);
+        let filmLengthDec = encodeFilmLength(filmLength);
+        let exposureToleranceDec = encodeExposureTolerance(exposureTolerance, 2);
+        // Display the result
+        let result = "ISO/DIN Speed: " + isoSpeedDec + "<br>" +
+            "Film Length: " + filmLengthDec + "<br>" +
+            "Exposure Tolerance: " + exposureToleranceDec;
+        document.getElementById('title').innerHTML = ` ${filmLengthDec} · ISO/DIN ${isoSpeedDec} `
+        document.getElementById('result').innerHTML = result;
+    }
+
+    decode()
+</script>
+</body>
+</html>
+
