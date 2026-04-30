@@ -1,36 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>DX Encoding Simulator</title>
+    <title>DX Encoding Simulator — Online Film DX Code Decoder & Encoder</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Dmytro Matsiuk">
     <meta name="description"
-          content="DX Encoding Simulator online Film DX decoder; Reading DX Camera Auto Sensing codes">
+          content="Free online DX Encoding Simulator. Decode and encode 35mm film DX codes (CAS — Camera Auto Sensing): ISO/DIN speed, film length, exposure tolerance. Print custom DX labels to hack expired or hand-rolled film.">
     <meta name="keywords"
-          content="DX Encoding Simulator, DX Encoding, DX decoder, DX encoder, DX film, DX film decoder, DX film encoder, DX film simulator, DX film simulator online, DX film">
+          content="DX encoding, DX code, DX decoder, DX encoder, DX simulator, film DX code, 35mm DX, CAS code, Camera Auto Sensing, ISO DIN, film length, exposure tolerance, hack DX, DX label, expired film, bulk film, analog photography">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
-    <meta name="theme-color" content="#000000">
-    <meta property="og:title" content="DX Encoding Simulator">
-    <meta property="og:description" content="DX Encoding Simulator online Film DX decoder">
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="canonical" href="https://dmmat.github.io/DX-decoder/">
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dmmat.github.io/DX-decoder/">
+    <meta property="og:title" content="DX Encoding Simulator — Online Film DX Code Decoder & Encoder">
+    <meta property="og:description" content="Decode and encode 35mm film DX codes online. ISO/DIN, film length, exposure tolerance. Print custom DX labels.">
+    <meta property="og:image" content="https://dmmat.github.io/DX-decoder/android-chrome-512x512.png">
+    <meta property="og:image:alt" content="DX Encoding Simulator — interactive DX code grid">
+    <meta property="og:site_name" content="DX Encoding Simulator">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DX Encoding Simulator">
+    <meta name="twitter:description" content="Decode and encode 35mm film DX codes online. ISO/DIN, film length, exposure tolerance. Print custom DX labels.">
+    <meta name="twitter:image" content="https://dmmat.github.io/DX-decoder/android-chrome-512x512.png">
+    <meta name="twitter:image:alt" content="DX Encoding Simulator — interactive DX code grid">
+
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <!--    manifest-->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="manifest" href="site.webmanifest">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "DX Encoding Simulator",
+      "url": "https://dmat.pp.ua/DX-decoder/",
+      "description": "Free online DX Encoding Simulator. Decode and encode 35mm film DX codes (Camera Auto Sensing): ISO/DIN speed, film length, exposure tolerance.",
+      "applicationCategory": "PhotographyApplication",
+      "operatingSystem": "Any (web)",
+      "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+      "author": {"@type": "Person", "name": "Dmytro Matsiuk"}
+    }
+    </script>
+
     <style>
+        :root {
+            --bg: #fafaf7;
+            --ink: #1a1a1a;
+            --muted: #6b6b6b;
+            --line: #1a1a1a;
+            --accent: #c8421f;
+            --film-orange: rgb(255, 181, 95);
+            --film-frame: #837070;
+            --film-perf: #d3d3d3;
+            --film-roll: #333;
+            --focus: #2563eb;
+            --maxw: 880px;
+            --read-w: 38rem;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { -webkit-text-size-adjust: 100%; }
+
         body {
-            padding: 0 30px;
+            margin: 0;
+            padding: 32px 24px 64px;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .wrap {
+            max-width: var(--maxw);
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+            margin: 0 0 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .lede {
+            margin: 0 0 32px;
+            color: var(--muted);
+            font-style: italic;
+            font-size: 1rem;
+            max-width: var(--read-w);
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            margin: 0 0 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: bold;
+        }
+
+        a {
+            color: var(--ink);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        a:hover, a:focus { color: var(--accent); }
+
+        :focus-visible {
+            outline: 2px solid var(--focus);
+            outline-offset: 2px;
         }
 
         .container {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: minmax(260px, auto) 1fr;
+            gap: 40px 48px;
+            align-items: start;
+            margin-bottom: 40px;
         }
 
-        .container .item {
-            margin: 0 25px;
+        @media (max-width: 640px) {
+            body { padding: 20px 16px 48px; }
+            .container { grid-template-columns: 1fr; gap: 32px; }
         }
 
+        /* --- Film visuals (kept as-is) --- */
         #grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -40,52 +144,86 @@
             width: 240px;
         }
 
-        .checkbox {
-            display: none;
-        }
+        .checkbox { position: absolute; opacity: 0; pointer-events: none; }
 
         .checkbox + label {
             display: block;
             cursor: cell;
             height: 40px;
-            background: white;
         }
 
-        .checkbox:checked + label {
-            background: black;
+        /* Top row — upper half of one continuous silver sheet */
+        .checkbox:nth-of-type(-n+6) + label {
+            background: linear-gradient(180deg, #fbfaf7 0%, #dedcd6 100%);
+        }
+        /* Bottom row — picks up where top ended */
+        .checkbox:nth-of-type(n+7) + label {
+            background: linear-gradient(180deg, #dedcd6 0%, #c0beb8 100%);
+        }
+
+        .checkbox:nth-of-type(-n+6):checked + label {
+            background: linear-gradient(180deg, #2a2a2a 0%, #050505 100%);
+            cursor: pointer;
+        }
+        .checkbox:nth-of-type(n+7):checked + label {
+            background: linear-gradient(180deg, #050505 0%, #1c1c1c 100%);
             cursor: pointer;
         }
 
         .checkbox:disabled + label {
-            color: gray;
             cursor: not-allowed;
         }
 
+        .checkbox:focus-visible + label {
+            outline: 2px solid var(--focus);
+            outline-offset: 2px;
+        }
 
         #box {
-            border: 1px solid black;
-            padding: 5px 10px 30px 10px;
+            border: 1px solid #1a1a1a;
+            padding: 0 0 24px;
             margin: 0;
             display: inline-block;
-            height: 74px;
-            background: rgb(255, 181, 95);
-            text-decoration: none;
+            height: 124px;
+            background: var(--film-orange);
             text-align: center;
+            color: #1a1a1a;
+            font-family: "Helvetica Neue", "Arial Narrow", Arial, sans-serif;
+            font-size: 13px;
+            font-stretch: condensed;
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08);
+            position: relative;
         }
+
+        #title {
+            display: block;
+            padding: 6px 10px 4px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(0,0,0,0.25);
+            background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(0,0,0,0) 60%);
+        }
+
+        #title .iso { color: #8a1a0f; font-weight: 800; }
+        #title .sep { color: rgba(0,0,0,0.35); margin: 0 4px; }
+        #title .exp, #title .tol { color: #1a1a1a; }
+
+        #grid { margin: 6px auto 0; }
 
         #roll {
             display: inline-block;
-            margin: -10px -5px;
-            background: #333333;
+            margin: 42px -5px;
+            background: var(--film-roll);
             border: 1px solid black;
             border-radius: 2px;
             height: 40px;
             width: 20px;
+            vertical-align: top;
         }
 
-
         .film-roll {
-            width: 220px;
+            width: 204px;
             height: 56px;
             overflow: hidden;
             position: relative;
@@ -95,11 +233,10 @@
         .frame {
             width: 100%;
             height: 100%;
-            background-color: #837070;
+            background-color: var(--film-frame);
             position: absolute;
             top: 0;
             left: 0;
-            box-sizing: border-box;
             padding: 10px;
         }
 
@@ -109,86 +246,271 @@
             transform: translateY(-50%);
         }
 
-        .left {
-            left: -10px;
-        }
-
-        .right {
-            right: -10px;
-        }
+        .left { left: -10px; }
+        .right { right: -10px; }
 
         .rounded-square {
             width: 20px;
             height: 10px;
-            background-color: #d3d3d3;
-            border-radius: 20px; /* Use border-radius: 50% for a rounded square effect */
+            background-color: var(--film-perf);
+            border-radius: 20px;
             margin: 15px;
         }
 
-        .footer {
-            margin-top: 30px;
+        /* --- Form panel --- */
+        .panel { min-width: 0; }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: 12px 16px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            max-width: 360px;
         }
 
+        .field-grid label {
+            font-weight: 600;
+            color: var(--ink);
+            font-size: 0.95rem;
+        }
+
+        select, input[type="number"], button {
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 6px 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--ink);
+            border-radius: 0;
+            min-height: 36px;
+        }
+
+        select { width: 100%; cursor: pointer; }
+
+        input[type="number"] {
+            width: 70px;
+            text-align: center;
+        }
+
+        button {
+            cursor: pointer;
+            background: var(--ink);
+            color: var(--bg);
+            padding: 6px 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: background 0.15s ease, transform 0.05s ease;
+        }
+
+        button:hover { background: var(--accent); }
+        button:active { transform: translateY(1px); }
+
+        /* --- Hack section --- */
+        .hack {
+            border-top: 1px solid var(--line);
+            padding-top: 24px;
+            margin-top: 8px;
+            max-width: var(--read-w);
+        }
+
+        .hack-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .hack-row label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .hack p {
+            margin: 0 0 12px;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .hack-steps {
+            margin: 20px 0 0;
+            padding-left: 22px;
+        }
+
+        .hack-steps li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .hack-steps li::marker {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* --- About section --- */
+        .about {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--line);
+            max-width: var(--read-w);
+        }
+
+        .about h2 {
+            margin-top: 24px;
+        }
+
+        .about h2:first-child {
+            margin-top: 0;
+        }
+
+        .about p {
+            margin: 0 0 12px;
+            color: var(--ink);
+        }
+
+        .about strong {
+            font-weight: 700;
+        }
+
+        .about-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 12px;
+        }
+
+        .about-list li {
+            position: relative;
+            padding-left: 18px;
+            margin-bottom: 6px;
+        }
+
+        .about-list li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 48px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line);
+            font-size: 0.95rem;
+            max-width: var(--read-w);
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px 24px;
+        }
     </style>
 </head>
 <body>
-<h1>DX Encoding Simulator</h1>
-<h3>You can click to squares to Reading DX Camera Auto Sensing codes or select props to simulate</h3>
-<div class="container">
-    <div>
-        <div class="film-roll">
-            <div class="frame"></div>
-            <div class="rounded-squares left">
-                <div class="rounded-square"></div>
-                <div class="rounded-square"></div>
+<main class="wrap">
+    <header>
+        <h1>DX Encoding Simulator</h1>
+        <p class="lede">Click squares to read DX Camera Auto Sensing codes, or pick film properties to simulate.</p>
+    </header>
+
+    <section class="container" aria-label="DX simulator">
+        <div class="film" aria-hidden="false">
+            <div class="film-roll">
+                <div class="frame"></div>
+                <div class="rounded-squares left">
+                    <div class="rounded-square"></div>
+                    <div class="rounded-square"></div>
+                </div>
+                <div class="rounded-squares right">
+                    <div class="rounded-square"></div>
+                    <div class="rounded-square"></div>
+                </div>
             </div>
-            <div class="rounded-squares right">
-                <div class="rounded-square"></div>
-                <div class="rounded-square"></div>
+            <div id="roll"></div>
+            <div id="box">
+                <span id="title">  </span>
+                <div id="grid" role="group" aria-label="DX code grid"></div>
             </div>
         </div>
 
+        <div class="panel">
+            <h2>Film properties</h2>
+            <div class="field-grid">
+                <label for="isoSpeed">ISO/DIN Speed</label>
+                <select id="isoSpeed"></select>
 
-        <div id="roll"></div>
-        <div id="box">
-            <span id="title">  </span>
-            <div id="grid"></div>
+                <label for="filmLength">Film Length</label>
+                <select id="filmLength"></select>
+
+                <label for="exposureTolerance">Exposure Tolerance</label>
+                <select id="exposureTolerance"></select>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <div class="item">
+    <section class="hack" aria-label="Print DX labels">
+        <h2>Hack your DX</h2>
+        <p>Print custom DX labels to use with expired or hand-rolled film.</p>
+        <div class="hack-row">
+            <label for="n">Count of DX prints
+                <input type="number" value="1" min="1" id="n" placeholder="1">
+            </label>
+            <button type="button" onclick="printDXCode()">Print</button>
+        </div>
+        <ol class="hack-steps">
+            <li>Strip the original DX pattern off the cassette — scrape or sand all 12 contact pads down to bare metal so the camera can't read the old code.</li>
+            <li>Print the new DX label on sticker paper (or paper + tape).</li>
+            <li>Cut out every white square from the printed grid — those become the metal contacts the camera will read.</li>
+            <li>Glue the label onto the cassette aligned with the original contact strip. Black squares stay covered, cut-out squares expose the bare metal underneath.</li>
+        </ol>
+    </section>
 
-        <h3> Film properties</h3>
+    <section class="about" aria-label="About DX encoding">
+        <h2>What is DX encoding?</h2>
         <p>
-            <label for="isoSpeed">ISO/DIN Speed:</label> <select id="isoSpeed"></select>
+            DX (Digital indeX) encoding is a standard introduced by Kodak in 1983
+            for 35&nbsp;mm film cassettes. A 12-cell silver-and-black grid printed
+            on the side of the canister tells the camera the film's
+            <strong>ISO/DIN speed</strong>, <strong>length</strong>
+            (number of exposures), and <strong>exposure tolerance</strong>.
+            Electrical contacts inside the camera read the pattern automatically —
+            this is called CAS (Camera Auto Sensing).
         </p>
-        <p>
-            <label for="filmLength">Film Length:</label> <select id="filmLength"></select>
-        </p>
-        <p>
-            <label for="exposureTolerance">Exposure Tolerance:</label> <select id="exposureTolerance"></select>
-        </p>
-    </div>
 
+        <h2>What is this simulator for?</h2>
+        <ul class="about-list">
+            <li><strong>Decode</strong> any DX code by clicking squares to match what you see on a real cassette.</li>
+            <li><strong>Encode</strong> by picking ISO, length, and tolerance — the grid updates to match.</li>
+            <li><strong>Hack expired or bulk-loaded film</strong>: print a custom DX sticker to trick your camera into using the right ISO when the original code is wrong or missing.</li>
+            <li><strong>Learn</strong> how analog cameras "talk" to film without any electronics inside the cassette.</li>
+        </ul>
 
-</div>
-<h3>hack your DX</h3>
-<label>
-    count of DX prints:
-    <input type="number" value="1" id="n" style="width: 30px" placeholder="count">
-</label>
-<button onclick="printDXCode()">print</button>
-<div class="footer">
-    <hr>
-    <ul>
-        <li>
-            <a href="https://github.com/dmmat/DX-decoder"> Contribute on Github</a>
-        </li>
-        <li>
-            <a href="https://en.wikipedia.org/wiki/DX_encoding"> Wiki about DX encoding</a>
-        </li>
-    </ul>
-</div>
+        <h2>How to read the grid</h2>
+        <p>
+            Cells <strong>1</strong> and <strong>7</strong> are always silver
+            (electrical ground). Cells <strong>2–6</strong> encode ISO speed,
+            <strong>8–10</strong> encode film length, <strong>11–12</strong>
+            encode exposure tolerance. Silver = contact (1), black = no contact (0).
+        </p>
+    </section>
+
+    <footer>
+        <ul>
+            <li><a href="https://github.com/dmmat/DX-decoder">Contribute on GitHub</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/DX_encoding">Wiki about DX encoding</a></li>
+        </ul>
+    </footer>
+</main>
 <script>
     // Create checkboxes
     let grid = document.getElementById('grid');
@@ -310,9 +632,7 @@
         document.getElementById('isoSpeed').value = isoSpeed;
         document.getElementById('exposureTolerance').value = exposureTolerance;
         document.getElementById('title').innerHTML = `
-    <span title="film length">  ${filmLengthText} </span>  ·
-    <span title="ISO/DIN"> ISO/DIN  ${isoSpeedText} </span>  ·
-    <span title="exposure tolerance">  ${exposureToleranceText} </span>
+    <span class="exp" title="film length">${filmLengthText}</span><span class="sep">·</span><span class="iso" title="ISO/DIN">ISO ${isoSpeedText}</span><span class="sep">·</span><span class="tol" title="exposure tolerance">${exposureToleranceText}</span>
     `
         console.log("DX", code)
 
