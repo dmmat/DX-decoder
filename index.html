@@ -308,6 +308,16 @@
         button:hover { background: var(--accent); }
         button:active { transform: translateY(1px); }
 
+        button.ghost {
+            background: transparent;
+            color: var(--ink);
+            border: 1px solid var(--ink);
+        }
+        button.ghost:hover {
+            background: var(--ink);
+            color: var(--bg);
+        }
+
         /* --- Hack section --- */
         .hack {
             border-top: 1px solid var(--line);
@@ -335,6 +345,17 @@
             margin: 0 0 12px;
             color: var(--muted);
             font-style: italic;
+        }
+
+        .hack-hint {
+            margin: 16px 0 0 !important;
+            padding: 10px 14px;
+            background: rgba(255, 181, 95, 0.18);
+            border-left: 3px solid var(--film-orange);
+            color: var(--ink) !important;
+            font-style: normal !important;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
 
         .hack-steps {
@@ -466,12 +487,24 @@
                 <input type="number" value="1" min="1" id="n" placeholder="1">
             </label>
             <button type="button" onclick="printDXCode()">Print</button>
+            <button type="button" class="ghost" onclick="downloadDXSvg()" title="Download SVG">SVG</button>
+            <button type="button" class="ghost" onclick="downloadDXPng()" title="Download PNG">PNG</button>
         </div>
+        <p class="hack-hint">
+            <strong>Tip:</strong> both files match the real DX label —
+            <strong>32.4&nbsp;×&nbsp;15&nbsp;mm</strong>. The SVG carries true mm
+            dimensions, so it prints 1:1 from any browser, CUPS, Inkscape or
+            Illustrator. For thermal label printers (Niimbot, Phomemo, Brother
+            P-touch, Zebra) import the PNG into the printer's app and set the
+            label size manually to <strong>32.4&nbsp;×&nbsp;15&nbsp;mm</strong> —
+            most of these apps fit-to-label by default and will scale the image
+            otherwise. A 15&nbsp;mm-wide thermal roll works best.
+        </p>
         <ol class="hack-steps">
             <li>Strip the original DX pattern off the cassette — scrape or sand all 12 contact pads down to bare metal so the camera can't read the old code.</li>
-            <li>Print the new DX label on sticker paper (or paper + tape).</li>
+            <li>Print the new DX label: either via <em>Print</em> (regular paper + glue) or <em>Download SVG/PNG</em> for a thermal label printer / sticker paper.</li>
             <li>Cut out every white square from the printed grid — those become the metal contacts the camera will read.</li>
-            <li>Glue the label onto the cassette aligned with the original contact strip. Black squares stay covered, cut-out squares expose the bare metal underneath.</li>
+            <li>Stick the label onto the cassette aligned with the original contact strip. Black squares stay covered, cut-out squares expose the bare metal underneath.</li>
         </ol>
     </section>
 
@@ -705,6 +738,73 @@
 
         // Tell the browser to print the new window
         printWindow.print();
+    }
+
+
+    // --- DX label dimensions (real-world mm, matches print) ---
+    const DX_CELL_W_MM = 5.4;
+    const DX_CELL_H_MM = 7.5;
+    const DX_COLS = 6;
+    const DX_ROWS = 2;
+
+    function dxFilename(ext) {
+        const iso = (isoSpeedText || 'iso').replace(/[\/°\s]/g, '');
+        const len = (filmLengthText || 'len').replace(/\s/g, '');
+        return `DX-${iso}-${len}.${ext}`;
+    }
+
+    function buildDXSvg() {
+        const w = DX_CELL_W_MM * DX_COLS;
+        const h = DX_CELL_H_MM * DX_ROWS;
+        const u = 10; // 1mm = 10 viewBox units
+        const cw = DX_CELL_W_MM * u, ch = DX_CELL_H_MM * u;
+        let rects = '';
+        for (let i = 0; i < 12; i++) {
+            const col = i % DX_COLS;
+            const row = Math.floor(i / DX_COLS);
+            const fill = code[i] === '1' ? '#ffffff' : '#000000';
+            rects += `<rect x="${col * cw}" y="${row * ch}" width="${cw}" height="${ch}" fill="${fill}" stroke="#9a9a9a" stroke-width="1"/>`;
+        }
+        return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${w}mm" height="${h}mm" viewBox="0 0 ${w * u} ${h * u}">
+<title>DX code ${code} — ISO ${isoSpeedText}, ${filmLengthText}, ${exposureToleranceText}</title>
+${rects}
+</svg>`;
+    }
+
+    function downloadBlob(filename, blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function downloadDXSvg() {
+        const svg = buildDXSvg();
+        downloadBlob(dxFilename('svg'), new Blob([svg], {type: 'image/svg+xml'}));
+    }
+
+    function downloadDXPng() {
+        const dpi = 600; // print quality
+        const mmToPx = dpi / 25.4;
+        const cw = DX_CELL_W_MM * mmToPx;
+        const ch = DX_CELL_H_MM * mmToPx;
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(cw * DX_COLS);
+        canvas.height = Math.round(ch * DX_ROWS);
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        for (let i = 0; i < 12; i++) {
+            const col = i % DX_COLS;
+            const row = Math.floor(i / DX_COLS);
+            ctx.fillStyle = code[i] === '1' ? '#ffffff' : '#000000';
+            ctx.fillRect(Math.round(col * cw), Math.round(row * ch), Math.ceil(cw), Math.ceil(ch));
+        }
+        canvas.toBlob(blob => downloadBlob(dxFilename('png'), blob), 'image/png');
     }
 
 
